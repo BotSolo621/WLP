@@ -1,8 +1,9 @@
 import time
 import keyboard
 import requests
+import socket
 
-device_name = "boos"
+device_name = socket.gethostname()
 while keyboard.is_pressed("`") == False:
     try:
         requests.get(f"http://localhost:8080/ping?device={device_name}")
