@@ -14,4 +14,5 @@ def connect(command):
     server.close()
     return response
 
-connect(":GETINFO")
+cows = connect(":GETINFO\neppybot")
+print(cows)

