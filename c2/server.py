@@ -1,13 +1,14 @@
 import socket
 
-ip = '0.0.0.0'# this is for local hosting, for the actual server host, use 0.0.0.0
+ip = '127.0.0.1'# this is for local hosting, for the actual server host, use 0.0.0.0
 port = 4570
 
+# Dict to store info per machine
 pcInfos = {}
+# List of all machine IDs that have ever connected
 machine_list = []
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_socket.bind((ip, port))
 server_socket.listen(5)
 
