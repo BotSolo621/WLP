@@ -19,7 +19,7 @@ while True:
     print(f"[+] Connection from {address}")
 
     msg = client_socket.recv(4096).decode()
-    print(f"[<] Received:\n{msg}")
+    print(f"[>] Received:\n{msg}")
 
     if msg.startswith(":PCINFO"):
         content = msg[len(":PCINFO"):].strip()
@@ -32,7 +32,7 @@ while True:
             machine_list.append(machine_id)
             print(f"[+] New machine added: {machine_id}")
         else:
-            print(f"[=] Existing machine updated: {machine_id}")
+            print(f"[+] Existing machine updated: {machine_id}")
 
     elif msg.startswith(":GETINFO"):
         response = ""
