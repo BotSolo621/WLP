@@ -1,6 +1,6 @@
 import socket
 
-ip = '127.0.0.1'
+ip = '127.0.0.1'# this is for local hosting, for the actual server host, use 0.0.0.0
 port = 4570
 
 # Dict to store info per machine
