@@ -1,11 +1,15 @@
 import socket
+import re
 
-ip = '0.0.0.0'# this is for local hosting, for the actual server host, use 0.0.0.0
+ip = '127.0.0.1'  #Local = 127.0.0.1, Public = 0.0.0.0
 port = 4570
 
+#Data
 pcInfos = {}
 machine_list = []
+response = ""
 
+#Opening server
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_socket.bind((ip, port))
@@ -18,10 +22,10 @@ while True:
     print(f"[+] Connection from {address}")
 
     msg = client_socket.recv(4096).decode()
-    print(f"[<] Received:\n{msg}")
+    print(f"[>] Received:\n{msg}")
 
     if msg.startswith(":PCINFO"):
-        content = msg[len(":PCINFO"):].strip()
+        content = msg[len(":PCINFO"):].strip() #removees :TAG
         lines = content.split('\n')
         machine_id = lines[0]
         info = '\n'.join(lines[1:])
@@ -31,15 +35,30 @@ while True:
             machine_list.append(machine_id)
             print(f"[+] New machine added: {machine_id}")
         else:
-            print(f"[=] Existing machine updated: {machine_id}")
+            print(f"[+] Existing machine updated: {machine_id}")
 
     elif msg.startswith(":GETINFO"):
-        response = ""
-        for machine_id, info in pcInfos.items():
-            response += f"[{machine_id}]\n{info}\n\n"
+        content = msg[len(":GETINFO"):].strip()  # get optional machine ID
+        if content:
+            machine_id = content
+            if machine_id in pcInfos:
+                info = pcInfos[machine_id]
+                response = f"[{machine_id}]\n{info}\n"
+            else:
+                response = f"[!] Machine ID '{machine_id}' not found.\n"
+        else:
+            # if no machine_id provided, send all (fallback)
+            response = ""
+            for machine_id, info in pcInfos.items():
+                response += f"[{machine_id}]\n{info}\n\n"
+
         client_socket.send(response.encode())
 
+        
+      
+
     elif msg.startswith(":LISTCOWS"):
+        # List all machine IDs
         response = "\n".join(machine_list)
         client_socket.send(response.encode())
 
