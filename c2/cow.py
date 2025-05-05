@@ -34,18 +34,18 @@ def main():
 
     while True:
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((ip, port))
+            server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            server.connect((ip, port))
 
             ping = f":CLIENTPING\n{node_name}\n{DeviceIP}"
-            s.send(ping.encode())
-            resp = s.recv(4096).decode()
+            server.send(ping.encode())
+            response = server.recv(4096).decode()
 
-            if resp.startswith(":COMMAND :GETINFO"):
+            if response.startswith(":COMMAND :GETINFO"):
                 print("[+] Got :GETINFO, sending PC info...")
                 send_pcinfo()
 
-            s.close()
+            server.close()
         except Exception as e:
             print(f"[!] Error: {e}")
 

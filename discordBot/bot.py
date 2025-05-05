@@ -31,11 +31,12 @@ async def on_ready():
     print(f"{bot.user.name} is ready!")
     await bot.tree.sync()   
 
-@bot.tree.command(name="getinfo", description="Get info of cows")
-async def getInfo(interaction: discord.Interaction):
+@bot.tree.command(name="getinfo", description="Get info of cow")
+@app_commands.describe(text="The cow's name")
+async def getInfo(interaction: discord.Interaction, text:str):
     await interaction.response.send_message("Attempting to get info...")
 
-    info = connect(":GETINFO")
+    info = connect(f":GETINFO\n{text}")
     
     # Send the result as a code block (for formatting)
     await interaction.followup.send(f"```{info}```")

