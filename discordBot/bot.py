@@ -64,11 +64,22 @@ async def getInfo(interaction: discord.Interaction, cow: str):
     await interaction.edit_original_response(content=f"```{info}```") # Send the info back to the user
 
 #Get screenshot of a specific cow
+from discord import app_commands
+import discord
+
 @bot.tree.command(name="getscreenshot", description="Screenshot the cow's current display")
 @app_commands.describe(cow="The cow's name")
 async def getScreenshot(interaction: discord.Interaction, cow: str):
     await interaction.response.send_message("Attempting to get screenshot...")
-    screenshot = run_remote_command(cow, "GETSCREENSHOT")  # Run the command to get screenshot
+    try:
+        screenshot = run_remote_command(cow, "GETSCREENSHOT")  # Should return the URL or error message
+        if screenshot.startswith("http"):
+            await interaction.followup.send(f"Screenshot from `{cow}`:\n{screenshot}")
+        else:
+            await interaction.followup.send(f"Failed to get screenshot: `{screenshot}`")
+    except Exception as e:
+        await interaction.followup.send(f"Error while getting screenshot: `{str(e)}`")
+
     await interaction.edit_original_response(content=screenshot) # Send the info back to the user
 
 # Run the bot with the provided token

