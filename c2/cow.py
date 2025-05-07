@@ -63,7 +63,6 @@ def send_screenshot():
         s.close()
 
     else:
-        print("Upload failed:", response.text)
         s.close()
 
 def main():

