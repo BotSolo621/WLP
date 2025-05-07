@@ -18,9 +18,16 @@ async def connect(command):
     try:
         server.connect((ip, port))
         server.send(command.encode())
-        response = await asyncio.to_thread(server.recv, 4096)
+
+        response = ""
+        while True:
+            part = await asyncio.to_thread(server.recv, 4096)
+            if not part:
+                break
+            response += part.decode()
+        
         server.close()
-        return response.decode()
+        return response
     except socket.timeout:
         server.close()
         return "Error: Timeout occurred while waiting for server response."
@@ -63,7 +70,7 @@ async def on_ready():
 async def listCows(interaction: discord.Interaction):
     await interaction.response.send_message("Listing all cows ever seen...")
     machines = await connect(":LISTCOWS")
-    await interaction.edit_original_response(content=f"```{machines}```")
+    await interaction.edit_original_response(content=f"```\n{machines}\n```")
 
 # ╔════════════════════════════════════════════════════════════════════╗
 # ║                        Command to get cow info                     ║

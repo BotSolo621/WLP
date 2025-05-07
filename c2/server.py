@@ -81,8 +81,6 @@ while True:
         name = lines[1]
         info = "\n".join(lines[2:])
         print_boxed(f"Received PCINFO from {name}.")
-        print_boxed(info)
-
         if name not in response_buffer:
             response_buffer[name] = {}
         response_buffer[name]["GETINFO"] = info
@@ -122,9 +120,9 @@ while True:
     elif msg.startswith(":LISTCOWS"):
         print_boxed("List of cows:")
         for cow in DeviceIDList:
-            print_boxed(f"- {cow}")
-        cows_list = "\n".join(DeviceIDList)
-        client_socket.sendall(cows_list.encode())
+            print_boxed(f"{cow}!")
+            cows_list = f"{cow}\n" 
+            client_socket.sendall(cows_list.encode())
 
     # ╔════════════════════════════════════════════════════════════════════╗
     # ║ > Handle :FETCHRESPONSE Command                                    ║
