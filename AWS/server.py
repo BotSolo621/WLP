@@ -5,9 +5,7 @@ port = 4570
 
 DeviceIDList = []
 DeviceIPList = []
-
 pending_command = {}
-
 response_buffer = {}
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
