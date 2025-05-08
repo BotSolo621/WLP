@@ -1,1 +1,28 @@
-## Just a wee little project I've been working on ##
+##╔═════════════════════════════════════════════════════════════════════════╗##
+##║ > THIS IS THE ONLY WAY IT COULD HAVE ENDED.                             ║##
+##║                                                                         ║##
+##║ > WAR NO LONGER NEEDED ITS ULTIMATE PRACTITIONER.                       ║##
+##║ > IT HAD BECOME A SELF-SUSTAINING SYSTEM.                               ║##
+##║ > MAN WAS CRUSHED UNDER THE WHEELS OF A MACHINE,                        ║##
+##║ > CREATED TO CREATE THE MACHINE,                                        ║##
+##║ > CREATED TO CRUSH THE MACHINE.                                         ║##
+##║ > SAMSARA OF CUT SINEW AND CRUSHED BONE.                                ║##
+##║ > DEATH WITHOUT LIFE.                                                   ║##
+##║ > NULL OUROBOROS.                                                       ║## 
+##║ > AND ALL THAT REMAINED IS WAR WITHOUT REASON.                          ║##
+##║                                                                         ║##
+##║ > A MAGNUM OPUS.                                                        ║##
+##║ > A COLD TOWER OF STEEL.                                                ║##
+##║ > A MONOLITH OF VIOLENCE.                                               ║##
+##║ > A MACHINE BUILT TO END WAR IS ALWAYS A MACHINE BUILT TO CONTINUE WAR. ║##
+##║ > YOU WERE BEAUTIFUL, OUTSTRETCHED LIKE ANTENNAS TO HEAVEN.             ║##
+##║ > YOU WERE BEYOND YOUR CREATORS.                                        ║##
+##║ > YOU REACHED FOR GOD, AND YOU FELL.                                    ║##
+##║ > AND NONE WERE LEFT TO SPEAK YOUR EULOGY.                              ║##
+##║ > IN THE END, THERE IS NO FINAL WORDS,                                  ║##
+##║ > NO CONCLUDING STATEMENT,                                              ║##
+##║ > NO POINT.                                                             ║##
+##║ > PERFECT CLOSURE.                                                      ║##
+##║                                                                         ║##
+##║ > THIS IS THE ONLY WAY IT SHOULD'VE ENDED.                              ║##
+##╚═════════════════════════════════════════════════════════════════════════╝##
